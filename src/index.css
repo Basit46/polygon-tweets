@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&family=Montserrat:wght@200;400;700&family=Space+Grotesk:wght@300;400;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  body {
+    @apply w-screen overflow-x-hidden;
+  }
+
+  .hero .tone {
+    @apply w-[145px] h-[54px] bg-violet-700 text-white hover:bg-white active:bg-violet-700 active:text-white hover:text-violet-700 hover:border-[2px] hover:border-violet-700 rounded-lg grid place-items-center text-center text-sm font-medium;
+  }
+
+  .how-it-works .box {
+    @apply w-[344.97px] h-[271.65px] pt-[2.12rem] px-[1.62rem] font-spaceGrotesk bg-purple-50 rounded-3xl border border-slate-900 flex-col justify-start items-start inline-flex;
+  }
+  .how-it-works .box h1 {
+    @apply mt-[1.56rem] mb-[0.75rem] text-slate-900 text-[22px] font-bold;
+  }
+  .how-it-works .box p {
+    @apply text-zinc-600 text-sm;
+  }
+
+  footer .links {
+    @apply flex flex-col items-center;
+  }
+  footer ul h1 {
+    @apply text-lg font-bold;
+  }
+  footer ul li {
+    @apply text-left text-sm font-medium mt-[0.94rem] cursor-pointer;
+  }
+  /* footer .social-links {
+    @apply flex flex-col;
+  } */
+  footer .social-links a {
+    @apply text-lg font-bold block text-center py-[1.5rem];
+  }
+}
