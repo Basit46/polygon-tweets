@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import sendIcon from "../assets/send.svg";
+import Loader from "./Loader";
 import Tweet from "./Tweet";
 
 const Hero = ({ isGenerated, setIsGenerated }) => {
@@ -52,7 +53,7 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
       const data = await response.json();
 
       setTweets(data.choices);
-      setIsGenerated(true);
+      setIsGenerated(!data.choices ? false : true);
       setLoading(false);
     } catch (error) {
       console.error("Error generating tweets:", error);
@@ -73,10 +74,10 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
         Write and schedule tweet with just a click to twitter. Say no more to
         delayed tweet
       </p>
-      <div className="w-[816.06px] h-[181.67px] bg-white rounded-xl shadow">
+      <div className="w-[816.06px] h-[181.67px] bg-white rounded-xl border-[1px] border-black shadow-md ">
         <div className="h-[107.91px] flex border-b-[2px] border-zinc-400">
           <textarea
-            className="resize-none flex-1 pl-[1.5rem] py-[1.25rem] outline-none"
+            className="resize-none flex-1 pl-[1.5rem] py-[1.25rem] outline-none rounded-xl"
             placeholder="Enter your thought"
             value={thought}
             onChange={(e) => setThought(e.target.value)}
@@ -103,9 +104,7 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
       </div>
 
       <div className="mt-[50px] flex flex-wrap gap-[1rem] justify-center">
-        {loading && (
-          <h1 className="text-black text-[2rem] text-center">Loading.....</h1>
-        )}
+        {loading && <Loader />}
         {tweets &&
           tweets.map((tweet, index) => <Tweet key={index} tweet={tweet} />)}
       </div>
