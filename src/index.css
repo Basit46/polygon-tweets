@@ -6,7 +6,7 @@
 
 @layer components {
   body {
-    @apply w-screen overflow-x-hidden;
+    @apply relative w-screen overflow-x-hidden;
   }
 
   .hero .tone {

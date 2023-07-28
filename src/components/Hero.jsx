@@ -2,12 +2,73 @@ import React, { useState } from "react";
 import sendIcon from "../assets/send.svg";
 import Loader from "./Loader";
 import Tweet from "./Tweet";
+import { pdfjs } from "react-pdf";
 
-const Hero = ({ isGenerated, setIsGenerated }) => {
+const Hero = ({ setIsGenerated, setCoverLoader }) => {
   const [loading, setLoading] = useState(false);
   const [thought, setThought] = useState("");
   const [tone, setTone] = useState("Overly-optimistic Dreamer");
   const [tweets, setTweets] = useState();
+
+  pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    setCoverLoader(true);
+    if (file) {
+      try {
+        const pdfText = await extractTextFromPDF(file);
+
+        const response = await fetch(
+          "https://api.openai.com/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${import.meta.env.VITE_MY_API_KEY}`,
+            },
+            body: JSON.stringify({
+              model: "gpt-3.5-turbo",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "You are a text summarizer, you will summarize a whole text into a simple paragraph",
+                },
+                {
+                  role: "user",
+                  content: `Summarize: ${pdfText}`,
+                },
+              ],
+              n: 1,
+            }),
+          }
+        );
+
+        const data = await response.json();
+        setThought(data.choices[0].message.content.trim());
+        setCoverLoader(false);
+      } catch (error) {
+        console.error("Error extracting text from PDF:", error);
+        setCoverLoader(false);
+      }
+    }
+  };
+
+  const extractTextFromPDF = async (file) => {
+    const loadingTask = pdfjs.getDocument(URL.createObjectURL(file));
+    const pdf = await loadingTask.promise;
+
+    const textContent = [];
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const content = await page.getTextContent();
+      const pageText = content.items.map((item) => item.str).join(" ");
+      textContent.push(pageText);
+    }
+
+    return textContent.join(" ");
+  };
 
   const tones = [
     "Overly-optimistic Dreamer",
@@ -15,18 +76,6 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
     "Constructive critic",
     "Former Polygon Supporter",
     "See More",
-  ];
-
-  const messages = [
-    {
-      role: "system",
-      content:
-        "You are a tweet generator, I will give you a thought and a tone, then you will provide a tweet that i can tweet based on the thought and tone",
-    },
-    {
-      role: "user",
-      content: `Generate a tweet, don't include hashtags in the genrated tweet and dont put it in quotes, Thought:${thought} Tone:${tone}`,
-    },
   ];
 
   const handleGenerateTweets = async () => {
@@ -44,8 +93,18 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
           },
           body: JSON.stringify({
             model: "gpt-3.5-turbo",
-            messages: messages,
-            n: 5,
+            messages: [
+              {
+                role: "system",
+                content:
+                  "You are a tweet generator, I will give you a thought and a tone, then you will provide a tweet that i can tweet based on the thought and tone",
+              },
+              {
+                role: "user",
+                content: `Generate a tweet, don't include hashtags in the genrated tweet and dont put it in quotes, Thought:${thought} Tone:${tone}`,
+              },
+            ],
+            n: 1,
           }),
         }
       );
@@ -65,7 +124,7 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
   return (
     <div
       id="hero"
-      className="hero w-full pt-[4.44rem] h-fit font-inter flex flex-col items-center "
+      className="hero w-full pt-[4.44rem] h-fit font-inter flex flex-col items-center"
     >
       <h1 className="w-[999px] text-center text-black text-[64px] font-bold leading-[1]">
         Generate more polygon tweets instantly
@@ -101,6 +160,10 @@ const Hero = ({ isGenerated, setIsGenerated }) => {
             </div>
           ))}
         </div>
+      </div>
+
+      <div>
+        <input type="file" onChange={handleFileChange} />
       </div>
 
       <div className="mt-[50px] flex flex-wrap gap-[1rem] justify-center">

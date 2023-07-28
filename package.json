@@ -10,11 +10,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "node-nlp": "^4.27.0",
     "openai": "^3.3.0",
+    "pdf-parse": "^1.1.1",
+    "pdf-to-text": "^0.0.7",
+    "pdfjs-dist": "^3.8.162",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
-    "react-scroll": "^1.8.9"
+    "react-pdf": "^7.3.0",
+    "react-scroll": "^1.8.9",
+    "textract": "^2.5.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.15",
